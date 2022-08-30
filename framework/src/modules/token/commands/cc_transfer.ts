@@ -40,7 +40,7 @@ export class CCTransferCommand extends BaseCommand {
 	}
 
 	public get name() {
-		return 'crossChaintransfer';
+		return 'crossChainTransfer';
 	}
 
 	// eslint-disable-next-line @typescript-eslint/require-await
