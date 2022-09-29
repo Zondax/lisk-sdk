@@ -13,6 +13,8 @@
  */
 
 import { NotFoundError } from '@liskhq/lisk-chain';
+import { codec } from '@liskhq/lisk-codec';
+import { utils } from '@liskhq/lisk-cryptography';
 import { BaseInteroperabilityStore } from '../base_interoperability_store';
 import {
 	CCM_STATUS_CHANNEL_UNAVAILABLE,
@@ -24,6 +26,7 @@ import {
 	EMPTY_FEE_ADDRESS,
 	LIVENESS_LIMIT,
 	MAINCHAIN_ID_BUFFER,
+	MIN_RETURN_FEE,
 	MODULE_NAME_INTEROPERABILITY,
 } from '../constants';
 import { createCCMsgBeforeSendContext } from '../context';
@@ -35,6 +38,7 @@ import {
 } from '../utils';
 import { MODULE_NAME_TOKEN, TokenCCMethod } from '../cc_methods';
 import { ForwardCCMsgResult } from './types';
+import { ccmSchema } from '../schemas';
 
 export class MainchainInteroperabilityStore extends BaseInteroperabilityStore {
 	public async isLive(chainID: Buffer, timestamp: number): Promise<boolean> {
@@ -136,7 +140,15 @@ export class MainchainInteroperabilityStore extends BaseInteroperabilityStore {
 		return ForwardCCMsgResult.INFORM_SIDECHAIN_TERMINATION;
 	}
 
-	public async bounce(ccm: CCMsg): Promise<void> {
+	public async bounce(ccm: CCMsg, errorCode: number): Promise<void> {
+		const ccmID = utils.hash(codec.encode(ccmSchema, ccm));
+
+		const minimumFee = MIN_RETURN_FEE * BigInt(ccmID.length);
+
+		if (ccm.status === CCM_STATUS_OK && ccm.fee >= minimumFee) {
+			
+		}
+
 		const terminatedStateAccountExists = await this.hasTerminatedStateAccount(ccm.sendingChainID);
 
 		// Messages from terminated chains are discarded, and never returned
