@@ -44,6 +44,10 @@ export class RegisterMultisignatureCommand extends BaseCommand {
 	public id = getIDAsKeyForStore(COMMAND_ID_REGISTER_MULTISIGNATURE_GROUP);
 	public schema = registerMultisignatureParamsSchema;
 
+	public get name(): string {
+		return 'registerMultisignatureGroup';
+	}
+
 	// eslint-disable-next-line @typescript-eslint/require-await
 	public async verify(
 		context: CommandVerifyContext<RegisterMultisignatureParams>,
