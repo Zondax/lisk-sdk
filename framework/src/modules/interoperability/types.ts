@@ -140,6 +140,18 @@ export interface CCMForwardContext {
 	ccu: CCUpdateParams;
 }
 
+export interface CCMBounceContext {
+	getMethodContext: () => MethodContext;
+	getStore: StoreCallback;
+	logger: Logger;
+	chainID: Buffer;
+	eventQueue: EventQueue;
+	feeAddress: Buffer;
+	ccm: CCMsg;
+	newCCMStatus: number;
+	ccmProcessedEventCode: number;
+}
+
 export interface LastCertificate {
 	height: number;
 	timestamp: number;
