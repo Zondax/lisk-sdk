@@ -13,6 +13,7 @@
  */
 import { BaseStore } from '../../base_store';
 import { ActiveValidator } from '../types';
+import { BLS_PUBLIC_KEY_LENGTH } from '../constants';
 
 export interface ChainValidators {
 	activeValidators: ActiveValidator[];
@@ -33,9 +34,9 @@ export const chainValidatorsSchema = {
 				properties: {
 					blsKey: {
 						dataType: 'bytes',
+						minLength: BLS_PUBLIC_KEY_LENGTH,
+						maxLength: BLS_PUBLIC_KEY_LENGTH,
 						fieldNumber: 1,
-						minLength: 48,
-						maxLength: 48,
 					},
 					bftWeight: {
 						dataType: 'uint64',
