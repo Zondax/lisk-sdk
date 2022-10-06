@@ -368,8 +368,4 @@ export interface GenesisInteroperabilityStore {
 		storeKey: Buffer;
 		storeValue: ChainID;
 	}[];
-	registeredNetworkIDsSubstore: {
-		storeKey: Buffer;
-		storeValue: ChainID;
-	}[];
 }
