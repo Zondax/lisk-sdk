@@ -70,6 +70,7 @@ import { OutboxRootStore } from '../../../../src/modules/interoperability/stores
 import { ChannelDataStore } from '../../../../src/modules/interoperability/stores/channel_data';
 import { OwnChainAccountStore } from '../../../../src/modules/interoperability/stores/own_chain_account';
 import { createStoreGetter } from '../../../../src/testing/utils';
+import { CHAIN_ID_LENGTH } from '../../../../src/modules/token/constants';
 
 jest.mock('@liskhq/lisk-cryptography', () => ({
 	...jest.requireActual('@liskhq/lisk-cryptography'),
@@ -1185,7 +1186,7 @@ describe('Utils', () => {
 		const timestamp = 2592000 * 100;
 		const chainAccount = {
 			name: 'account1',
-			chainID: Buffer.alloc(0),
+			chainID: Buffer.alloc(CHAIN_ID_LENGTH),
 			lastCertificate: {
 				height: 567467,
 				timestamp: timestamp - 500000,
@@ -1196,7 +1197,7 @@ describe('Utils', () => {
 		};
 		const sidechainChainAccount = {
 			name: 'sidechain1',
-			chainID: getRandomBytes(32),
+			chainID: Buffer.alloc(CHAIN_ID_LENGTH),
 			lastCertificate: {
 				height: 10,
 				stateRoot: utils.getRandomBytes(32),
@@ -1254,8 +1255,8 @@ describe('Utils', () => {
 			outboxSize: 1,
 			partnerChainInboxSize: 1,
 		};
-		const registeredNameId = { id: Buffer.from('77', 'hex') };
-		const registeredChainId = { id: Buffer.from('88', 'hex') };
+		const registeredNameId = { chainID: Buffer.alloc(CHAIN_ID_LENGTH) };
+		const registeredChainId = { chainID: Buffer.alloc(CHAIN_ID_LENGTH) };
 		const validData = {
 			outboxRootSubstore: [
 				{ storeKey: Buffer.from([0, 0, 0, 1]), storeValue: outboxRoot },
