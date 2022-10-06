@@ -214,7 +214,7 @@ describe('Sidechain registration command', () => {
 			await nameSubstore.set(
 				createStoreGetter(stateStore),
 				Buffer.from(transactionParams.name, 'utf8'),
-				{ id: utils.intToBuffer(0, 4) },
+				{ chainID: utils.intToBuffer(0, 4) },
 			);
 			const result = await sidechainRegistrationCommand.verify(verifyContext);
 
@@ -536,7 +536,7 @@ describe('Sidechain registration command', () => {
 
 		it('should add an entry to registered names substore', async () => {
 			// Arrange
-			const expectedValue = { id: newChainID };
+			const expectedValue = { chainID: newChainID };
 
 			// Act
 			await sidechainRegistrationCommand.execute(context);

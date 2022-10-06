@@ -241,7 +241,7 @@ export class SidechainRegistrationCommand extends BaseInteroperabilityCommand {
 
 		// Add an entry in the registered names substore
 		const registeredNamesSubstore = this.stores.get(RegisteredNamesStore);
-		await registeredNamesSubstore.set(context, Buffer.from(name, 'utf-8'), { id: chainID });
+		await registeredNamesSubstore.set(context, Buffer.from(name, 'utf-8'), { chainID });
 
 		// Burn the registration fee
 		await this._tokenMethod.burn(methodContext, senderAddress, TOKEN_ID_LSK, REGISTRATION_FEE);
