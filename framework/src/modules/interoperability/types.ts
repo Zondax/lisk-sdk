@@ -332,7 +332,7 @@ export interface ChainValidators {
 }
 
 export interface ChainID {
-	id: Buffer;
+	chainID: Buffer;
 }
 
 export interface GenesisInteroperabilityStore {
