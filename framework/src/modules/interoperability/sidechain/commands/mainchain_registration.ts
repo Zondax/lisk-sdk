@@ -27,7 +27,6 @@ import {
 	TOKEN_ID_LSK_MAINCHAIN,
 	EMPTY_BYTES,
 	CROSS_CHAIN_COMMAND_REGISTRATION,
-	CCM_SENT_STATUS_SUCCESS,
 } from '../../constants';
 import {
 	ccmSchema,
@@ -229,17 +228,19 @@ export class MainchainRegistrationCommand extends BaseInteroperabilityCommand {
 		await ownChainAccountSubstore.set(context, EMPTY_BYTES, ownChainAccount);
 
 		const ccmID = utils.hash(codec.encode(ccmSchema, ccm));
-		this.events
-			.get(CcmProcessedEvent)
-			.log(methodContext, ownChainAccount.chainID, MAINCHAIN_ID_BUFFER, {
-				ccmID,
-				status: CCM_SENT_STATUS_SUCCESS,
-			});
+		this.events.get(CcmProcessedEvent).log(methodContext, ownChainAccount.chainID, MAINCHAIN_ID_BUFFER, {
+			ccmID,
+		});
 	}
 
 	protected getInteroperabilityStore(
 		context: StoreGetter | ImmutableStoreGetter,
 	): SidechainInteroperabilityStore {
-		return new SidechainInteroperabilityStore(this.stores, context, this.interoperableCCMethods);
+		return new SidechainInteroperabilityStore(
+			this.stores,
+			context,
+			this.interoperableCCMethods,
+			this.events,
+		);
 	}
 }
