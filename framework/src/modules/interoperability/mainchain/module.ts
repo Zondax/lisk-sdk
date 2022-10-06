@@ -53,6 +53,7 @@ export class MainchainInteroperabilityModule extends BaseInteroperabilityModule 
 	public endpoint = new MainchainInteroperabilityEndpoint(
 		this.stores,
 		this.offchainStores,
+		this.events,
 		this.interoperableCCMethods,
 	);
 
