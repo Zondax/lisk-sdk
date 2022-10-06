@@ -280,13 +280,18 @@ export class SidechainRegistrationCommand extends BaseInteroperabilityCommand {
 		const ccmID = utils.hash(codec.encode(ccmSchema, ccm));
 		this.events.get(CcmProcessedEvent).log(methodContext, ownChainAccount.chainID, chainID, {
 			ccmID,
-			status: CCM_SENT_STATUS_SUCCESS,
+			result: CCM_SENT_STATUS_SUCCESS,
 		});
 	}
 
 	protected getInteroperabilityStore(
 		context: StoreGetter | ImmutableStoreGetter,
 	): MainchainInteroperabilityStore {
-		return new MainchainInteroperabilityStore(this.stores, context, this.interoperableCCMethods);
+		return new MainchainInteroperabilityStore(
+			this.stores,
+			context,
+			this.interoperableCCMethods,
+			this.events,
+		);
 	}
 }
