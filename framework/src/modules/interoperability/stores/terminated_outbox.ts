@@ -12,6 +12,7 @@
  * Removal or modification of this copyright notice is prohibited.
  */
 import { BaseStore } from '../../base_store';
+import { HASH_LENGTH } from '../constants';
 
 export interface TerminatedOutboxAccount {
 	outboxRoot: Buffer;
@@ -32,6 +33,8 @@ export const terminatedOutboxSchema = {
 	properties: {
 		outboxRoot: {
 			dataType: 'bytes',
+			minLength: HASH_LENGTH,
+			maxLength: HASH_LENGTH,
 			fieldNumber: 1,
 		},
 		outboxSize: {
