@@ -24,6 +24,7 @@ import {
 	CHAIN_TERMINATED,
 	CROSS_CHAIN_COMMAND_NAME_REGISTRATION,
 	EMPTY_BYTES,
+	HASH_LENGTH,
 	LIVENESS_LIMIT,
 	MAINCHAIN_ID_BUFFER,
 	MAX_NUM_VALIDATORS,
@@ -1188,8 +1189,8 @@ describe('Utils', () => {
 			lastCertificate: {
 				height: 567467,
 				timestamp: timestamp - 500000,
-				stateRoot: Buffer.alloc(0),
-				validatorsHash: Buffer.alloc(0),
+				stateRoot: Buffer.alloc(HASH_LENGTH),
+				validatorsHash: Buffer.alloc(HASH_LENGTH),
 			},
 			status: 2739,
 		};
