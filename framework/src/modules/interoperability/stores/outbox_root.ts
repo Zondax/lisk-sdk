@@ -12,6 +12,7 @@
  * Removal or modification of this copyright notice is prohibited.
  */
 import { BaseStore } from '../../base_store';
+import { HASH_LENGTH } from '../constants';
 
 export interface OutboxRoot {
 	root: Buffer;
@@ -24,6 +25,8 @@ export const outboxRootSchema = {
 	properties: {
 		root: {
 			dataType: 'bytes',
+			minLength: HASH_LENGTH,
+			maxLength: HASH_LENGTH,
 			fieldNumber: 1,
 		},
 	},
