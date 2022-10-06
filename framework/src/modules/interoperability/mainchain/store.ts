@@ -15,9 +15,14 @@
 import { NotFoundError } from '@liskhq/lisk-chain';
 import { codec } from '@liskhq/lisk-codec';
 import { utils } from '@liskhq/lisk-cryptography';
+import { ImmutableStoreGetter, StoreGetter } from '../../base_store';
 import { BaseInteroperabilityStore } from '../base_interoperability_store';
 import {
-	CCM_STATUS_CHANNEL_UNAVAILABLE,
+	CCM_PROCESSED_CODE_CHANNEL_UNAVAILABLE,
+	CCM_PROCESSED_RESULT_BOUNCED,
+	CCM_PROCESSED_RESULT_DISCARDED,
+	CCM_STATUS_CODE_CHANNEL_UNAVAILABLE,
+	CCM_STATUS_CODE_FAILED_CCM,
 	CCM_STATUS_OK,
 	CHAIN_ACTIVE,
 	CHAIN_REGISTERED,
@@ -30,7 +35,7 @@ import {
 	MODULE_NAME_INTEROPERABILITY,
 } from '../constants';
 import { createCCMsgBeforeSendContext } from '../context';
-import { CCMForwardContext, CCMsg, SendInternalContext } from '../types';
+import { CCMBounceContext, CCMForwardContext, CCMsg, SendInternalContext } from '../types';
 import {
 	getEncodedSidechainTerminatedCCMParam,
 	handlePromiseErrorWithNull,
@@ -39,8 +44,26 @@ import {
 import { MODULE_NAME_TOKEN, TokenCCMethod } from '../cc_methods';
 import { ForwardCCMsgResult } from './types';
 import { ccmSchema } from '../schemas';
+import { NamedRegistry } from '../../named_registry';
+import { BaseInteroperableMethod } from '../base_interoperable_method';
+import { CcmProcessedEvent } from '../events/ccm_processed';
+import { CcmSendSuccessEvent } from '../events/ccm_send_success';
 
 export class MainchainInteroperabilityStore extends BaseInteroperabilityStore {
+	public constructor(
+		stores: NamedRegistry,
+		context: StoreGetter | ImmutableStoreGetter,
+		interoperableModuleMethods: Map<string, BaseInteroperableMethod>,
+		events: NamedRegistry,
+	) {
+		super(stores, context, interoperableModuleMethods, events);
+		this.events.register(CcmProcessedEvent, new CcmProcessedEvent(MODULE_NAME_INTEROPERABILITY));
+		this.events.register(
+			CcmSendSuccessEvent,
+			new CcmSendSuccessEvent(MODULE_NAME_INTEROPERABILITY),
+		);
+	}
+
 	public async isLive(chainID: Buffer, timestamp: number): Promise<boolean> {
 		const ownChainAccount = await this.getOwnChainAccount();
 		if (chainID.equals(ownChainAccount.chainID)) {
@@ -110,8 +133,11 @@ export class MainchainInteroperabilityStore extends BaseInteroperabilityStore {
 		if (ccm.status !== CCM_STATUS_OK) {
 			return ForwardCCMsgResult.INVALID_CCM;
 		}
-
-		await this.bounce(ccm);
+		await this.bounce({
+			...ccmForwardContext,
+			newCCMStatus: CCM_STATUS_CODE_CHANNEL_UNAVAILABLE,
+			ccmProcessedEventCode: CCM_PROCESSED_CODE_CHANNEL_UNAVAILABLE,
+		});
 
 		if (!receivingChainAccount || receivingChainAccount.status === CHAIN_REGISTERED) {
 			return ForwardCCMsgResult.INACTIVE_RECEIVING_CHAIN;
@@ -140,30 +166,49 @@ export class MainchainInteroperabilityStore extends BaseInteroperabilityStore {
 		return ForwardCCMsgResult.INFORM_SIDECHAIN_TERMINATION;
 	}
 
-	public async bounce(ccm: CCMsg, errorCode: number): Promise<void> {
+	public async bounce(context: CCMBounceContext): Promise<void> {
+		const { ccm, eventQueue, newCCMStatus, ccmProcessedEventCode } = context;
 		const ccmID = utils.hash(codec.encode(ccmSchema, ccm));
-
 		const minimumFee = MIN_RETURN_FEE * BigInt(ccmID.length);
 
 		if (ccm.status === CCM_STATUS_OK && ccm.fee >= minimumFee) {
-			
-		}
+			this.events
+				.get(CcmProcessedEvent)
+				.log({ eventQueue }, ccm.sendingChainID, ccm.receivingChainID, {
+					ccmID,
+					result: CCM_PROCESSED_RESULT_BOUNCED,
+					code: ccmProcessedEventCode,
+				});
+			const newCcm = {
+				...ccm,
+				sendingChainID: ccm.receivingChainID,
+				receivingChainID: ccm.sendingChainID,
+				status: newCCMStatus,
+			};
 
-		const terminatedStateAccountExists = await this.hasTerminatedStateAccount(ccm.sendingChainID);
+			// If the function is called during the cross-chain command execution, the fee is set to 0
+			if (newCCMStatus === CCM_STATUS_CODE_FAILED_CCM) {
+				newCcm.fee = BigInt(0);
+			} else {
+				newCcm.fee -= minimumFee;
+			}
 
-		// Messages from terminated chains are discarded, and never returned
-		if (terminatedStateAccountExists) {
+			await this.addToOutbox(newCcm.receivingChainID, newCcm);
+			const newCcmID = utils.hash(codec.encode(ccmSchema, newCcm));
+			this.events
+				.get(CcmSendSuccessEvent)
+				.log({ eventQueue }, newCcm.sendingChainID, newCcm.receivingChainID, newCcmID, { ccmID });
+
 			return;
 		}
 
-		const newCCM = {
-			...ccm,
-			sendingChainID: ccm.receivingChainID,
-			receivingChainID: ccm.sendingChainID,
-			status: CCM_STATUS_CHANNEL_UNAVAILABLE,
-		};
-
-		await this.addToOutbox(newCCM.receivingChainID, newCCM);
+		this.events
+			.get(CcmProcessedEvent)
+			.log({ eventQueue }, ccm.sendingChainID, ccm.receivingChainID, {
+				ccmID,
+				result: CCM_PROCESSED_RESULT_DISCARDED,
+				code: ccmProcessedEventCode,
+			});
 	}
 
 	public async sendInternal(sendContext: SendInternalContext): Promise<boolean> {
