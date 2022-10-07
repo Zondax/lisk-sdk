@@ -161,7 +161,7 @@ describe('Legacy Chain Handler', () => {
 	});
 
 	describe('sync', () => {
-		it('test behaviors', async () => {
+		it('should have expected behaviors', async () => {
 			jest.spyOn(legacyChainHandler['_storage'], 'saveBlock');
 			jest.spyOn(legacyChainHandler['_storage'], 'setLegacyChainBracketInfo');
 			jest.spyOn(legacyChainHandler['_network'], 'applyNodeInfo');
