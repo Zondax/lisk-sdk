@@ -107,7 +107,7 @@ export class Engine {
 		await this._network.start();
 		if (this._config.legacy.sync) {
 			this._logger.info('Legacy block sync started');
-			await this._legacyChainHandler.syncBlocks();
+			await this._legacyChainHandler.sync();
 			this._logger.info('Legacy block sync completed');
 		}
 		await this._generator.start();
@@ -163,6 +163,7 @@ export class Engine {
 		});
 		this._legacyChainHandler = new LegacyChainHandler({
 			legacyConfig: this._config.legacy,
+			network: this._network,
 		});
 		this._rpcServer = new RPCServer(this._config.system.dataPath, this._config.rpc);
 
@@ -200,7 +201,7 @@ export class Engine {
 			generatorDB: this._generatorDB,
 			logger: this._logger,
 		});
-		await this._legacyChainHandler.init({
+		this._legacyChainHandler.init({
 			db: this._legacyDB,
 		});
 
