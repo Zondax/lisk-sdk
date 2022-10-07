@@ -143,12 +143,10 @@ export class LegacyChainHandler {
 		let legacyBlocks: LegacyBlock[];
 		try {
 			// this part is needed to make sure `data` returns ONLY `{ blocks: Buffer[] }` & not any extra field
-			const decodedData = codec.decode<{ blocks: Buffer[] }>(
+			const { blocks } = codec.decode<{ blocks: Buffer[] }>(
 				getBlocksFromIdResponseSchema,
 				data as Buffer,
 			);
-
-			const { blocks } = decodedData;
 			this._applyValidation(blocks);
 			legacyBlocks = blocks.map(block => decodeBlock(block).block);
 		} catch (err) {
