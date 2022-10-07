@@ -228,9 +228,11 @@ export class MainchainRegistrationCommand extends BaseInteroperabilityCommand {
 		await ownChainAccountSubstore.set(context, EMPTY_BYTES, ownChainAccount);
 
 		const ccmID = utils.hash(codec.encode(ccmSchema, ccm));
-		this.events.get(CcmProcessedEvent).log(methodContext, ownChainAccount.chainID, MAINCHAIN_ID_BUFFER, {
-			ccmID,
-		});
+		this.events
+			.get(CcmProcessedEvent)
+			.log(methodContext, ownChainAccount.chainID, MAINCHAIN_ID_BUFFER, {
+				ccmID,
+			});
 	}
 
 	protected getInteroperabilityStore(

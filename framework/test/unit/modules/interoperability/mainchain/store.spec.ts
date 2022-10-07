@@ -156,13 +156,14 @@ describe('Mainchain interoperability store', () => {
 				newCCMStatus: CCM_STATUS_CODE_FAILED_CCM,
 			});
 
-			expect(
-				mainchainInteroperabilityStore.addToOutbox,
-			).toHaveBeenCalledWith(newCCM.receivingChainID, {
-				...newCCM,
-				fee: BigInt(0),
-				status: CCM_STATUS_CODE_FAILED_CCM,
-			});
+			expect(mainchainInteroperabilityStore.addToOutbox).toHaveBeenCalledWith(
+				newCCM.receivingChainID,
+				{
+					...newCCM,
+					fee: BigInt(0),
+					status: CCM_STATUS_CODE_FAILED_CCM,
+				},
+			);
 		});
 
 		it(`should call addToOutbox with new CCM with fee minus ${minimumFee} if newCCMStatus !== ${CCM_STATUS_CODE_FAILED_CCM}`, async () => {
