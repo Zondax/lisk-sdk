@@ -134,9 +134,10 @@ export class MainchainInteroperabilityStore extends BaseInteroperabilityStore {
 			return ForwardCCMsgResult.INVALID_CCM;
 		}
 		await this.bounce({
-			...ccmForwardContext,
+			ccm,
 			newCCMStatus: CCM_STATUS_CODE_CHANNEL_UNAVAILABLE,
 			ccmProcessedEventCode: CCM_PROCESSED_CODE_CHANNEL_UNAVAILABLE,
+			eventQueue,
 		});
 
 		if (!receivingChainAccount || receivingChainAccount.status === CHAIN_REGISTERED) {
@@ -170,7 +171,6 @@ export class MainchainInteroperabilityStore extends BaseInteroperabilityStore {
 		const { ccm, eventQueue, newCCMStatus, ccmProcessedEventCode } = context;
 		const ccmID = utils.hash(codec.encode(ccmSchema, ccm));
 		const minimumFee = MIN_RETURN_FEE * BigInt(ccmID.length);
-
 		if (ccm.status === CCM_STATUS_OK && ccm.fee >= minimumFee) {
 			this.events
 				.get(CcmProcessedEvent)
@@ -192,7 +192,6 @@ export class MainchainInteroperabilityStore extends BaseInteroperabilityStore {
 			} else {
 				newCcm.fee -= minimumFee;
 			}
-
 			await this.addToOutbox(newCcm.receivingChainID, newCcm);
 			const newCcmID = utils.hash(codec.encode(ccmSchema, newCcm));
 			this.events
