@@ -17,7 +17,6 @@ import { utils } from '@liskhq/lisk-cryptography';
 import { MainchainInteroperabilityModule, testing } from '../../../../../src';
 import { StoreGetter } from '../../../../../src/modules/base_store';
 import {
-	CCM_STATUS_CHANNEL_UNAVAILABLE,
 	MAINCHAIN_ID,
 	LIVENESS_LIMIT,
 	MAX_CCM_SIZE,
@@ -109,7 +108,7 @@ describe('Mainchain interoperability store', () => {
 			crossChainCommand: CROSS_CHAIN_COMMAND_NAME_REGISTRATION,
 			sendingChainID: utils.intToBuffer(2, 4),
 			receivingChainID: utils.intToBuffer(3, 4),
-			fee: BigInt(1),
+			fee: BigInt(100000),
 			status: CCM_STATUS_OK,
 			params: Buffer.alloc(0),
 		};
@@ -118,23 +117,25 @@ describe('Mainchain interoperability store', () => {
 			...ccm,
 			sendingChainID: ccm.receivingChainID,
 			receivingChainID: ccm.sendingChainID,
-			status: CCM_STATUS_CHANNEL_UNAVAILABLE,
 		};
 
 		const ccmBounceContext = {
-			...testing.createCCMethodContext({ ccm }),
+			ccm,
 			newCCMStatus: CCM_STATUS_OK,
 			ccmProcessedEventCode: 0,
+			eventQueue: new EventQueue(0),
 		};
 
 		const ccmID = utils.hash(codec.encode(ccmSchema, ccm));
 		const minimumFee = MIN_RETURN_FEE * BigInt(ccmID.length);
-		const ccmProcessedEvent = mainchainInteroperabilityStore.events.get(CcmProcessedEvent);
-		const ccmSendSuccessEvent = mainchainInteroperabilityStore.events.get(CcmSendSuccessEvent);
-		jest.spyOn(ccmProcessedEvent, 'log');
-		jest.spyOn(ccmSendSuccessEvent, 'log');
+		let ccmProcessedEvent: CcmProcessedEvent;
+		let ccmSendSuccessEvent: CcmSendSuccessEvent;
 
 		beforeEach(() => {
+			ccmProcessedEvent = mainchainInteroperabilityStore.events.get(CcmProcessedEvent);
+			ccmSendSuccessEvent = mainchainInteroperabilityStore.events.get(CcmSendSuccessEvent);
+			jest.spyOn(ccmProcessedEvent, 'log');
+			jest.spyOn(ccmSendSuccessEvent, 'log');
 			mainchainInteroperabilityStore.addToOutbox = jest.fn();
 		});
 
@@ -150,23 +151,32 @@ describe('Mainchain interoperability store', () => {
 
 		it(`should call addToOutbox with new CCM with zero fee if newCCMStatus === ${CCM_STATUS_CODE_FAILED_CCM}`, async () => {
 			// Act
-			await mainchainInteroperabilityStore.bounce(ccmBounceContext);
+			await mainchainInteroperabilityStore.bounce({
+				...ccmBounceContext,
+				newCCMStatus: CCM_STATUS_CODE_FAILED_CCM,
+			});
 
 			expect(
 				mainchainInteroperabilityStore.addToOutbox,
-			).toHaveBeenCalledWith(newCCM.receivingChainID, { ...newCCM, fee: BigInt(0) });
+			).toHaveBeenCalledWith(newCCM.receivingChainID, {
+				...newCCM,
+				fee: BigInt(0),
+				status: CCM_STATUS_CODE_FAILED_CCM,
+			});
 		});
 
 		it(`should call addToOutbox with new CCM with fee minus ${minimumFee} if newCCMStatus !== ${CCM_STATUS_CODE_FAILED_CCM}`, async () => {
 			// Act
 			await mainchainInteroperabilityStore.bounce(ccmBounceContext);
 
-			expect(
-				mainchainInteroperabilityStore.addToOutbox,
-			).toHaveBeenCalledWith(newCCM.receivingChainID, {
-				...newCCM,
-				fee: (newCCM.fee -= minimumFee),
-			});
+			expect(mainchainInteroperabilityStore.addToOutbox).toHaveBeenCalledWith(
+				newCCM.receivingChainID,
+				{
+					...newCCM,
+					status: CCM_STATUS_OK,
+					fee: (newCCM.fee -= minimumFee),
+				},
+			);
 		});
 
 		it(`should emit ${EVENT_NAME_CCM_PROCESSED} event if ccm status is ${CCM_STATUS_OK} and ccm fee is >= ${minimumFee}`, async () => {
@@ -180,7 +190,7 @@ describe('Mainchain interoperability store', () => {
 			// Act
 			await mainchainInteroperabilityStore.bounce(ccmBounceContext);
 
-			expect(ccmSendSuccessEvent).toHaveBeenCalled();
+			expect(ccmSendSuccessEvent.log).toHaveBeenCalled();
 		});
 	});
 
@@ -415,7 +425,8 @@ describe('Mainchain interoperability store', () => {
 		});
 	});
 
-	describe('forward', () => {
+	// TODO: To be updated in issue #7623
+	describe.skip('forward', () => {
 		let tokenCCMethod: any;
 		let forwardContext: CCMForwardContext;
 		let receivingChainAccount: any;
