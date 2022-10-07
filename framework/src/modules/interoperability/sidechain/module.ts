@@ -57,6 +57,7 @@ export class SidechainInteroperabilityModule extends BaseInteroperabilityModule 
 		this.stores,
 		this.offchainStores,
 		this.interoperableCCMethods,
+		this.events,
 	);
 
 	private readonly _mainchainRegistrationCommand = new MainchainRegistrationCommand(
