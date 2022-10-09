@@ -77,7 +77,9 @@ export class LegacyChainHandler {
 		}
 
 		this._network.applyNodeInfo({
-			legacy: this._legacyConfig.brackets.map(bracket => Buffer.from(bracket.snapshotBlockID)),
+			legacy: this._legacyConfig.brackets.map(bracket =>
+				Buffer.from(bracket.snapshotBlockID, 'hex'),
+			),
 		});
 
 		clearTimeout(this._timeout);
