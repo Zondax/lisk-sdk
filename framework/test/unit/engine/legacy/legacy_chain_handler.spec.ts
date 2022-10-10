@@ -39,7 +39,7 @@ describe('Legacy Chain Handler', () => {
 	const db = new Database(dir);
 	let legacyBlock19583716: LegacyBlock;
 
-	beforeEach(() => {
+	beforeEach(async () => {
 		legacyConfig = {
 			sync: true,
 			brackets: [
@@ -108,7 +108,7 @@ describe('Legacy Chain Handler', () => {
 		network.applyNodeInfo = jest.fn();
 
 		legacyChainHandler = new LegacyChainHandler({ legacyConfig, network });
-		legacyChainHandler.init({ db });
+		await legacyChainHandler.init({ db });
 
 		jest.spyOn(legacyChainHandler['_network'], 'getConnectedPeers').mockImplementation(() => {
 			return peers as any;
