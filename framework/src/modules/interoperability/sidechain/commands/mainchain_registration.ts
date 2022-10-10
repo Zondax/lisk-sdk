@@ -51,8 +51,8 @@ import { OutboxRootStore } from '../../stores/outbox_root';
 import { OwnChainAccountStore } from '../../stores/own_chain_account';
 import { ImmutableStoreGetter, StoreGetter } from '../../../base_store';
 import { ChainAccountUpdatedEvent } from '../../events/chain_account_updated';
-import { CcmProcessedEvent } from '../../events/ccm_processed';
 import { InvalidRegistrationSignatureEvent } from '../../events/invalid_registration_signature';
+import { CcmSendSuccessEvent } from '../../events/ccm_send_success';
 
 export class MainchainRegistrationCommand extends BaseInteroperabilityCommand {
 	public schema = mainchainRegParams;
@@ -228,9 +228,10 @@ export class MainchainRegistrationCommand extends BaseInteroperabilityCommand {
 		await ownChainAccountSubstore.set(context, EMPTY_BYTES, ownChainAccount);
 
 		const ccmID = utils.hash(codec.encode(ccmSchema, ccm));
+
 		this.events
-			.get(CcmProcessedEvent)
-			.log(methodContext, ownChainAccount.chainID, MAINCHAIN_ID_BUFFER, {
+			.get(CcmSendSuccessEvent)
+			.log(methodContext, ownChainAccount.chainID, MAINCHAIN_ID_BUFFER, ccmID, {
 				ccmID,
 			});
 	}
