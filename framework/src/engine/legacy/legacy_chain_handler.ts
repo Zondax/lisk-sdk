@@ -36,7 +36,7 @@ interface LegacyHandlerInitArgs {
 
 export class LegacyChainHandler {
 	private readonly _network: Network;
-	private _storage!: Storage;
+	private readonly _storage!: Storage;
 	private readonly _legacyConfig: LegacyConfig;
 	private _timeout!: NodeJS.Timeout;
 
@@ -45,8 +45,23 @@ export class LegacyChainHandler {
 		this._network = args.network;
 	}
 
-	public init(args: LegacyHandlerInitArgs): void {
-		this._storage = new Storage(args.db);
+	public async init(args: LegacyHandlerInitArgs): Promise<void> {
+		const storage = new Storage(args.db);
+
+		for (const bracket of this._legacyConfig.brackets) {
+			const bracketInfo = await storage.getLegacyChainBracketInfo(
+				Buffer.from(bracket.snapshotBlockID, 'hex'),
+			);
+
+			// Save config brackets in advance, these will be used in next step (`sync`)
+			if (!bracketInfo) {
+				await storage.setLegacyChainBracketInfo(Buffer.from(bracket.snapshotBlockID), {
+					startHeight: bracket.startHeight,
+					snapshotBlockHeight: bracket.snapshotHeight,
+					lastBlockHeight: bracket.snapshotHeight,
+				});
+			}
+		}
 	}
 
 	public async sync() {
@@ -65,11 +80,11 @@ export class LegacyChainHandler {
 			if (bracket.startHeight === bracketInfo.lastBlockHeight) {
 				continue;
 			}
-			const legacyBlock = decodeBlock(
+			const lastBlock = decodeBlock(
 				await this._storage.getBlockByHeight(bracketInfo.lastBlockHeight),
 			).block;
 
-			await this._trySyncBlocks(bracket, legacyBlock);
+			await this._trySyncBlocks(bracket, lastBlock);
 			await this._storage.setLegacyChainBracketInfo(
 				Buffer.from(bracket.snapshotBlockID, 'hex'),
 				bracketInfo,
