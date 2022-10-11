@@ -599,7 +599,7 @@ describe('Utils', () => {
 	describe('checkInboxUpdateValidity', () => {
 		const activeValidatorsUpdate = [...defaultActiveValidatorsUpdate];
 
-		const partnerChainOutboxRoot = cryptography.utils.getRandomBytes(32);
+		const partnerChainOutboxRoot = cryptography.utils.getRandomBytes(HASH_LENGTH);
 		const inboxTree = {
 			root: Buffer.from('7f9d96a09a3fd17f3478eb7bef3a8bda00e1238b', 'hex'),
 			appendPath: [
@@ -1004,7 +1004,7 @@ describe('Utils', () => {
 			partnerChannelStoreMock = interopMod.stores.get(ChannelDataStore);
 
 			partnerChannelData = {
-				partnerChainOutboxRoot: Buffer.alloc(1),
+				partnerChainOutboxRoot: Buffer.alloc(HASH_LENGTH),
 				inbox: {
 					size: 2,
 					appendPath: [Buffer.alloc(1)],
@@ -1013,7 +1013,7 @@ describe('Utils', () => {
 				outbox: {
 					size: 0,
 					appendPath: [],
-					root: Buffer.alloc(0),
+					root: Buffer.alloc(HASH_LENGTH),
 				},
 				messageFeeTokenID: {
 					chainID: Buffer.from([0, 0, 0, 0]),
@@ -1213,19 +1213,19 @@ describe('Utils', () => {
 		};
 		const channelData = {
 			inbox: {
-				appendPath: [Buffer.alloc(1), Buffer.alloc(1)],
-				root: cryptography.utils.getRandomBytes(38),
+				appendPath: [Buffer.alloc(HASH_LENGTH), Buffer.alloc(HASH_LENGTH)],
+				root: cryptography.utils.getRandomBytes(HASH_LENGTH),
 				size: 18,
 			},
 			messageFeeTokenID: { chainID: utils.intToBuffer(1, 4), localID: utils.intToBuffer(0, 4) },
 			outbox: {
-				appendPath: [Buffer.alloc(1), Buffer.alloc(1)],
-				root: cryptography.utils.getRandomBytes(38),
+				appendPath: [Buffer.alloc(HASH_LENGTH), Buffer.alloc(HASH_LENGTH)],
+				root: cryptography.utils.getRandomBytes(HASH_LENGTH),
 				size: 18,
 			},
-			partnerChainOutboxRoot: cryptography.utils.getRandomBytes(38),
+			partnerChainOutboxRoot: cryptography.utils.getRandomBytes(HASH_LENGTH),
 		};
-		const outboxRoot = { root: getRandomBytes(32) };
+		const outboxRoot = { root: getRandomBytes(HASH_LENGTH) };
 		const validatorsHashInput = {
 			activeValidators: [
 				{
@@ -1251,7 +1251,7 @@ describe('Utils', () => {
 			initialized: true,
 		};
 		const terminatedOutboxAccount = {
-			outboxRoot: getRandomBytes(32),
+			outboxRoot: getRandomBytes(HASH_LENGTH),
 			outboxSize: 1,
 			partnerChainInboxSize: 1,
 		};

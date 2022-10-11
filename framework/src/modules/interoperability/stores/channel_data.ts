@@ -12,40 +12,8 @@
  * Removal or modification of this copyright notice is prohibited.
  */
 import { BaseStore } from '../../base_store';
-
-export interface Inbox {
-	appendPath: Buffer[];
-	size: number;
-	root: Buffer;
-}
-
-export interface InboxJSON {
-	appendPath: string[];
-	size: number;
-	root: string;
-}
-
-export interface Outbox {
-	appendPath: Buffer[];
-	size: number;
-	root: Buffer;
-}
-
-export interface OutboxJSON {
-	appendPath: string[];
-	size: number;
-	root: string;
-}
-
-export interface MessageFeeTokenID {
-	chainID: Buffer;
-	localID: Buffer;
-}
-
-export interface MessageFeeTokenIDJSON {
-	chainID: string;
-	localID: string;
-}
+import { Inbox, Outbox, MessageFeeTokenID } from '../types';
+import { HASH_LENGTH } from '../constants';
 
 export interface ChannelData {
 	inbox: Inbox;
@@ -53,6 +21,28 @@ export interface ChannelData {
 	partnerChainOutboxRoot: Buffer;
 	messageFeeTokenID: MessageFeeTokenID;
 }
+
+const inboxOutboxProps = {
+	appendPath: {
+		type: 'array',
+		items: {
+			dataType: 'bytes',
+			minLength: HASH_LENGTH,
+			maxLength: HASH_LENGTH,
+		},
+		fieldNumber: 1,
+	},
+	size: {
+		dataType: 'uint32',
+		fieldNumber: 2,
+	},
+	root: {
+		dataType: 'bytes',
+		minLength: HASH_LENGTH,
+		maxLength: HASH_LENGTH,
+		fieldNumber: 3,
+	},
+};
 
 export const channelSchema = {
 	$id: '/modules/interoperability/channel',
@@ -63,48 +53,18 @@ export const channelSchema = {
 			type: 'object',
 			fieldNumber: 1,
 			required: ['appendPath', 'size', 'root'],
-			properties: {
-				appendPath: {
-					type: 'array',
-					items: {
-						dataType: 'bytes',
-					},
-					fieldNumber: 1,
-				},
-				size: {
-					dataType: 'uint32',
-					fieldNumber: 2,
-				},
-				root: {
-					dataType: 'bytes',
-					fieldNumber: 3,
-				},
-			},
+			properties: inboxOutboxProps,
 		},
 		outbox: {
 			type: 'object',
 			fieldNumber: 2,
 			required: ['appendPath', 'size', 'root'],
-			properties: {
-				appendPath: {
-					type: 'array',
-					items: {
-						dataType: 'bytes',
-					},
-					fieldNumber: 1,
-				},
-				size: {
-					dataType: 'uint32',
-					fieldNumber: 2,
-				},
-				root: {
-					dataType: 'bytes',
-					fieldNumber: 3,
-				},
-			},
+			properties: inboxOutboxProps,
 		},
 		partnerChainOutboxRoot: {
 			dataType: 'bytes',
+			minLength: HASH_LENGTH,
+			maxLength: HASH_LENGTH,
 			fieldNumber: 3,
 		},
 		messageFeeTokenID: {
