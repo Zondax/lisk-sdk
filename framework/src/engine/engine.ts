@@ -201,7 +201,7 @@ export class Engine {
 			generatorDB: this._generatorDB,
 			logger: this._logger,
 		});
-		this._legacyChainHandler.init({
+		await this._legacyChainHandler.init({
 			db: this._legacyDB,
 		});
 
