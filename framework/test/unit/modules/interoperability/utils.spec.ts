@@ -1247,7 +1247,7 @@ describe('Utils', () => {
 		};
 		const terminatedStateAccount = {
 			stateRoot: sidechainChainAccount.lastCertificate.stateRoot,
-			mainchainStateRoot: EMPTY_BYTES,
+			mainchainStateRoot: Buffer.alloc(HASH_LENGTH),
 			initialized: true,
 		};
 		const terminatedOutboxAccount = {

@@ -42,6 +42,7 @@ import {
 	MESSAGE_TAG_CERTIFICATE,
 	MODULE_NAME_INTEROPERABILITY,
 	SMT_KEY_LENGTH,
+	HASH_LENGTH,
 } from './constants';
 import {
 	ccmSchema,
@@ -79,6 +80,7 @@ interface CommonExecutionLogicArgs {
 	partnerChainStore: ChainAccountStore;
 	chainIDBuffer: Buffer;
 }
+
 // Returns the big endian uint32 serialization of an integer x, with 0 <= x < 2^32 which is 4 bytes long.
 export const getIDAsKeyForStore = (id: number) => utils.intToBuffer(id, 4);
 
@@ -848,13 +850,13 @@ export const initGenesisStateUtil = async (
 			}
 		} else if (terminatedStateStoreValue.initialized === true) {
 			if (
-				terminatedStateStoreValue.stateRoot.length !== 32 ||
-				!terminatedStateStoreValue.mainchainStateRoot?.equals(EMPTY_BYTES)
+				terminatedStateStoreValue.stateRoot.length !== HASH_LENGTH ||
+				terminatedStateStoreValue.mainchainStateRoot?.length !== HASH_LENGTH
 			) {
 				throw new Error(
 					`For the initialized account associated with terminated state store key ${terminatedStateStoreKey.toString(
 						'hex',
-					)} the mainchainStateRoot must be set to empty bytes and stateRoot to a 32-bytes value.`,
+					)} the mainchainStateRoot must be set to a 32-bytes value and stateRoot to a 32-bytes value.`,
 				);
 			}
 		}

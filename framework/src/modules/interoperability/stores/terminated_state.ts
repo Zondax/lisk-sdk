@@ -12,6 +12,7 @@
  * Removal or modification of this copyright notice is prohibited.
  */
 import { BaseStore } from '../../base_store';
+import { HASH_LENGTH } from '../constants';
 
 export interface TerminatedStateAccount {
 	stateRoot: Buffer;
@@ -28,14 +29,18 @@ export interface TerminatedStateAccountJSON {
 export const terminatedStateSchema = {
 	$id: '/modules/interoperability/terminatedState',
 	type: 'object',
-	required: ['stateRoot'],
+	required: ['stateRoot', 'mainchainStateRoot', 'initialized'],
 	properties: {
 		stateRoot: {
 			dataType: 'bytes',
+			minLength: HASH_LENGTH,
+			maxLength: HASH_LENGTH,
 			fieldNumber: 1,
 		},
 		mainchainStateRoot: {
 			dataType: 'bytes',
+			minLength: HASH_LENGTH,
+			maxLength: HASH_LENGTH,
 			fieldNumber: 2,
 		},
 		initialized: {
