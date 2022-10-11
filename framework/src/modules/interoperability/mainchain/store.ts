@@ -15,7 +15,6 @@
 import { NotFoundError } from '@liskhq/lisk-chain';
 import { codec } from '@liskhq/lisk-codec';
 import { utils } from '@liskhq/lisk-cryptography';
-import { ImmutableStoreGetter, StoreGetter } from '../../base_store';
 import { BaseInteroperabilityStore } from '../base_interoperability_store';
 import {
 	CCM_PROCESSED_CODE_CHANNEL_UNAVAILABLE,
@@ -44,26 +43,10 @@ import {
 import { MODULE_NAME_TOKEN, TokenCCMethod } from '../cc_methods';
 import { ForwardCCMsgResult } from './types';
 import { ccmSchema } from '../schemas';
-import { NamedRegistry } from '../../named_registry';
-import { BaseInteroperableMethod } from '../base_interoperable_method';
 import { CcmProcessedEvent } from '../events/ccm_processed';
 import { CcmSendSuccessEvent } from '../events/ccm_send_success';
 
 export class MainchainInteroperabilityStore extends BaseInteroperabilityStore {
-	public constructor(
-		stores: NamedRegistry,
-		context: StoreGetter | ImmutableStoreGetter,
-		interoperableModuleMethods: Map<string, BaseInteroperableMethod>,
-		events: NamedRegistry,
-	) {
-		super(stores, context, interoperableModuleMethods, events);
-		this.events.register(CcmProcessedEvent, new CcmProcessedEvent(MODULE_NAME_INTEROPERABILITY));
-		this.events.register(
-			CcmSendSuccessEvent,
-			new CcmSendSuccessEvent(MODULE_NAME_INTEROPERABILITY),
-		);
-	}
-
 	public async isLive(chainID: Buffer, timestamp: number): Promise<boolean> {
 		const ownChainAccount = await this.getOwnChainAccount();
 		if (chainID.equals(ownChainAccount.chainID)) {
