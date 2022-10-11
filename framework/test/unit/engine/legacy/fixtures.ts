@@ -83,6 +83,33 @@ export const blockFixtures = [
 			),
 		],
 	},
+	{
+		header: {
+			version: 2,
+			timestamp: 1663169850,
+			height: 19583716,
+			previousBlockID: Buffer.from(
+				'31636e108a3ee5d22672631c582dbd8e06576b932f3cd303144abf165a3bc84d',
+				'hex',
+			),
+			transactionRoot: Buffer.from(
+				'80683eece5491fb875566d0b68246e47bda5bae7269766d3437d668a27d7136e',
+				'hex',
+			),
+			generatorPublicKey: Buffer.from(
+				'2d8365f4241690bb0bc00aa821c1ba2fa9648d8b367472ca9af44a89ef59a55e',
+				'hex',
+			),
+			reward: BigInt('100000000'),
+			asset: Buffer.from('0880a5ab091094a5ab091a10a15dd87df61606cd474f1038af29d5b3', 'hex'),
+			signature: Buffer.from(
+				'31c75cd21a676f19a3e5c72afd941a1c75bfb6f8088c15ea64c5e91c1e0fc37636e9a14b897b0dc61075db851fe0ba2b9c7b383eeb30d05d5dc846991aaa9108',
+				'hex',
+			),
+			id: Buffer.from('228fa60061b61ea87708581ea56b8ae534c86269a6597a3bbbdaa4f7aac492a3', 'hex'),
+		},
+		transactions: [],
+	},
 ];
 
 export const createFakeLegacyBlockHeaderV2 = (

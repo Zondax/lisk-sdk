@@ -14,7 +14,7 @@
 
 import { codec } from '@liskhq/lisk-codec';
 import { P2PRequestPacket } from '@liskhq/lisk-p2p/dist-node/types';
-import { Database } from '@liskhq/lisk-db';
+import { Database, NotFoundError } from '@liskhq/lisk-db';
 import { LegacyConfig } from '../../types';
 import { Network } from '../network';
 import { getBlocksFromIdResponseSchema } from '../consensus/schema';
@@ -52,6 +52,9 @@ export class LegacyChainHandler {
 			try {
 				await this._storage.getLegacyChainBracketInfo(Buffer.from(bracket.snapshotBlockID, 'hex'));
 			} catch (err) {
+				if (!(err instanceof NotFoundError)) {
+					throw err;
+				}
 				// Save config brackets in advance, these will be used in next step (`sync`)
 				await this._storage.setLegacyChainBracketInfo(Buffer.from(bracket.snapshotBlockID), {
 					startHeight: bracket.startHeight,
@@ -83,6 +86,11 @@ export class LegacyChainHandler {
 			).block;
 
 			await this._trySyncBlocks(bracket, lastBlock);
+
+			// at this point all the blocks belonging to above bracket have synced
+			// save bracket with updated info
+			bracketInfo.lastBlockHeight = bracket.startHeight; // startHeight is the LAST block
+
 			await this._storage.setLegacyChainBracketInfo(
 				Buffer.from(bracket.snapshotBlockID, 'hex'),
 				bracketInfo,
@@ -157,7 +165,7 @@ export class LegacyChainHandler {
 		const { data } = response;
 		let legacyBlocks: LegacyBlock[];
 		try {
-			// this part is needed to make sure `data` returns ONLY `{ blocks: Buffer[] }` & not any extra field
+			// this part is needed to make sure `data` returns ONLY `{ blocks: Buffer[] }` & not any extra field(s)
 			const { blocks } = codec.decode<{ blocks: Buffer[] }>(
 				getBlocksFromIdResponseSchema,
 				data as Buffer,
