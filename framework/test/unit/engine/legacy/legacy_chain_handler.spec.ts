@@ -90,12 +90,12 @@ describe('Legacy Chain Handler', () => {
 					startHeight: 0,
 					snapshotBlockHeight: 0,
 					lastBlockHeight: 0,
-				}) as any,
+				}) as any, // this means this bracket is already synced, since it's lastBlockHeight equals bracket's startHeight
 			)
 			.mockReturnValueOnce(
 				encodeLegacyChainBracketInfo({
-					startHeight: 0,
-					snapshotBlockHeight: 0,
+					startHeight: 19583710,
+					snapshotBlockHeight: 19583716,
 					lastBlockHeight: 19583716,
 				}) as any,
 			);
@@ -105,7 +105,9 @@ describe('Legacy Chain Handler', () => {
 			.mockReturnValueOnce(encodeBlock(legacyBlock19583716) as any); // we want to return blocks from this height ONCE
 
 		// `getLegacyBlocksFromId` should return blocks in DESC order
-		const reversedFixtures = blockFixtures.sort((a, b) => b.header.height - a.header.height);
+		const reversedFixtures = blockFixtures
+			.slice(0, 2)
+			.sort((a, b) => b.header.height - a.header.height);
 		const encodedBlocks = reversedFixtures.map(block => encodeBlock(block));
 
 		jest
