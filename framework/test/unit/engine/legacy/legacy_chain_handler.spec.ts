@@ -140,7 +140,7 @@ describe('Legacy Chain Handler', () => {
 			await legacyChainHandler.sync();
 
 			expect(legacyChainHandler['_storage'].saveBlock).toHaveBeenCalledTimes(2);
-			expect(legacyChainHandler['_storage'].setLegacyChainBracketInfo).toHaveBeenCalledTimes(1);
+			expect(legacyChainHandler['_storage'].setLegacyChainBracketInfo).toHaveBeenCalledTimes(2);
 		});
 	});
 });

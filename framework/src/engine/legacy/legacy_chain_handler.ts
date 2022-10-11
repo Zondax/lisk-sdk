@@ -38,7 +38,7 @@ export class LegacyChainHandler {
 	private readonly _network: Network;
 	private _storage!: Storage;
 	private readonly _legacyConfig: LegacyConfig;
-	private _timeout!: NodeJS.Timeout;
+	private _syncTimeout!: NodeJS.Timeout;
 
 	public constructor(args: LegacyChainHandlerArgs) {
 		this._legacyConfig = args.legacyConfig;
@@ -86,15 +86,6 @@ export class LegacyChainHandler {
 			).block;
 
 			await this._trySyncBlocks(bracket, lastBlock);
-
-			// at this point all the blocks belonging to above bracket have synced
-			// save bracket with updated info
-			bracketInfo.lastBlockHeight = bracket.startHeight; // startHeight is the LAST block
-
-			await this._storage.setLegacyChainBracketInfo(
-				Buffer.from(bracket.snapshotBlockID, 'hex'),
-				bracketInfo,
-			);
 		}
 
 		this._network.applyNodeInfo({
@@ -103,7 +94,7 @@ export class LegacyChainHandler {
 			),
 		});
 
-		clearTimeout(this._timeout);
+		clearTimeout(this._syncTimeout);
 	}
 
 	private async _trySyncBlocks(bracket: LegacyBlockBracket, lastBlock: LegacyBlock) {
@@ -112,7 +103,7 @@ export class LegacyChainHandler {
 		} catch (err) {
 			if (err instanceof PeerNotFoundWithLegacyInfo) {
 				// eslint-disable-next-line @typescript-eslint/no-misused-promises
-				this._timeout = setTimeout(async () => {
+				this._syncTimeout = setTimeout(async () => {
 					await this._trySyncBlocks(bracket, lastBlock);
 				}, 120000); // 2 mints = (60 * 2) * 1000
 			} else {
@@ -177,7 +168,6 @@ export class LegacyChainHandler {
 			return;
 		}
 
-		let lastBlock: LegacyBlock | undefined;
 		for (const block of legacyBlocks) {
 			if (block.header.height > bracket.startHeight) {
 				await this._storage.saveBlock(
@@ -185,13 +175,24 @@ export class LegacyChainHandler {
 					block.header.height,
 					encodeBlock(block),
 				);
-				lastBlock = block;
 			}
 		}
 
+		const lastBlock = legacyBlocks[legacyBlocks.length - 1];
 		if (lastBlock && lastBlock.header.height > bracket.startHeight) {
+			await this._updateBracketInfo(lastBlock, bracket);
 			await this.syncBlocks(bracket, lastBlock);
 		}
+
+		await this._updateBracketInfo(lastBlock, bracket);
+	}
+
+	private async _updateBracketInfo(lastBlock: LegacyBlock, bracket: LegacyBlockBracket) {
+		await this._storage.setLegacyChainBracketInfo(Buffer.from(bracket.snapshotBlockID, 'hex'), {
+			startHeight: bracket.startHeight,
+			lastBlockHeight: lastBlock?.header.height,
+			snapshotBlockHeight: bracket.snapshotHeight,
+		});
 	}
 
 	private _applyValidation(blocks: Buffer[]) {
