@@ -193,6 +193,16 @@ describe('Mainchain interoperability store', () => {
 
 			expect(ccmSendSuccessEvent.log).toHaveBeenCalled();
 		});
+
+		it(`should emit ${EVENT_NAME_CCM_PROCESSED} event with if ccm status is not ${CCM_STATUS_OK}`, async () => {
+			// Act
+			await mainchainInteroperabilityStore.bounce({
+				...ccmBounceContext,
+				newCCMStatus: CCM_STATUS_CODE_FAILED_CCM,
+			});
+
+			expect(ccmSendSuccessEvent.log).toHaveBeenCalled();
+		});
 	});
 
 	describe('isLive', () => {
