@@ -162,7 +162,7 @@ export class MainchainInteroperabilityStore extends BaseInteroperabilityStore {
 					result: CCM_PROCESSED_RESULT_BOUNCED,
 					code: ccmProcessedEventCode,
 				});
-			const newCcm = {
+			const newCCM = {
 				...ccm,
 				sendingChainID: ccm.receivingChainID,
 				receivingChainID: ccm.sendingChainID,
@@ -171,15 +171,15 @@ export class MainchainInteroperabilityStore extends BaseInteroperabilityStore {
 
 			// If the function is called during the cross-chain command execution, the fee is set to 0
 			if (newCCMStatus === CCM_STATUS_CODE_FAILED_CCM) {
-				newCcm.fee = BigInt(0);
+				newCCM.fee = BigInt(0);
 			} else {
-				newCcm.fee -= minimumFee;
+				newCCM.fee -= minimumFee;
 			}
-			await this.addToOutbox(newCcm.receivingChainID, newCcm);
-			const newCcmID = utils.hash(codec.encode(ccmSchema, newCcm));
+			await this.addToOutbox(newCCM.receivingChainID, newCCM);
+			const newCCMID = utils.hash(codec.encode(ccmSchema, newCCM));
 			this.events
 				.get(CcmSendSuccessEvent)
-				.log({ eventQueue }, newCcm.sendingChainID, newCcm.receivingChainID, newCcmID, { ccmID });
+				.log({ eventQueue }, newCCM.sendingChainID, newCCM.receivingChainID, newCCMID, { ccmID });
 
 			return;
 		}
