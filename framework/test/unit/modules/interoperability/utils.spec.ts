@@ -616,10 +616,7 @@ describe('Utils', () => {
 		};
 		const partnerChannelData: ChannelData = {
 			inbox: inboxTree,
-			messageFeeTokenID: {
-				chainID: utils.intToBuffer(1, 4),
-				localID: utils.intToBuffer(0, 4),
-			},
+			messageFeeTokenID: Buffer.from('0000000000000011', 'hex'),
 			outbox: outboxTree,
 			partnerChainOutboxRoot,
 		};
@@ -1015,10 +1012,7 @@ describe('Utils', () => {
 					appendPath: [],
 					root: Buffer.alloc(HASH_LENGTH),
 				},
-				messageFeeTokenID: {
-					chainID: Buffer.from([0, 0, 0, 0]),
-					localID: Buffer.from([0, 0, 0, 0]),
-				},
+				messageFeeTokenID: Buffer.from('0000000000000011', 'hex'),
 			};
 			const stateStore = new PrefixedStateReadWriter(new InMemoryPrefixedStateDB());
 			context = {
@@ -1217,7 +1211,7 @@ describe('Utils', () => {
 				root: cryptography.utils.getRandomBytes(HASH_LENGTH),
 				size: 18,
 			},
-			messageFeeTokenID: { chainID: utils.intToBuffer(1, 4), localID: utils.intToBuffer(0, 4) },
+			messageFeeTokenID: Buffer.from('0000000000000011', 'hex'),
 			outbox: {
 				appendPath: [Buffer.alloc(HASH_LENGTH), Buffer.alloc(HASH_LENGTH)],
 				root: cryptography.utils.getRandomBytes(HASH_LENGTH),
@@ -2002,10 +1996,7 @@ describe('Utils', () => {
 						storeKey: Buffer.from([0, 0, 1, 0]),
 						storeValue: {
 							...channelData,
-							messageFeeTokenID: {
-								chainID: Buffer.from([0, 0, 1, 0]),
-								localID: utils.intToBuffer(0, 4),
-							},
+							messageFeeTokenID: Buffer.from('0000000000000011', 'hex'),
 						},
 					},
 				],
@@ -2016,56 +2007,6 @@ describe('Utils', () => {
 				assets: new BlockAssets([{ module: MODULE_NAME_INTEROPERABILITY, data: encodedAsset }]),
 			}).createInitGenesisStateContext();
 			await expect(initGenesisStateUtil(context, interopMod.stores)).toResolve();
-		});
-
-		it('should throw if some chain id corresponding to message fee token id of a channel is neither 1 nor corresponding native token id of either chains', async () => {
-			const validData1 = {
-				...validData,
-				channelDataSubstore: [
-					{
-						storeKey: Buffer.from([0, 0, 0, 1]),
-						storeValue: {
-							...channelData,
-							messageFeeTokenID: {
-								chainID: Buffer.from([0, 0, 2, 0]),
-								localID: utils.intToBuffer(0, 4),
-							},
-						},
-					},
-					{ storeKey: Buffer.from([0, 0, 1, 0]), storeValue: channelData },
-				],
-			};
-			const encodedAsset = codec.encode(genesisInteroperabilityStoreSchema, validData1);
-			const context = createGenesisBlockContext({
-				stateStore,
-				assets: new BlockAssets([{ module: MODULE_NAME_INTEROPERABILITY, data: encodedAsset }]),
-			}).createInitGenesisStateContext();
-			await expect(initGenesisStateUtil(context, interopMod.stores)).rejects.toThrow();
-		});
-
-		it('should throw if some chain id corresponding to message fee token id of a channel is 1 but corresponding local id is not 0', async () => {
-			const validData1 = {
-				...validData,
-				channelDataSubstore: [
-					{
-						storeKey: Buffer.from([0, 0, 0, 1]),
-						storeValue: {
-							...channelData,
-							messageFeeTokenID: {
-								chainID: utils.intToBuffer(1, 4),
-								localID: utils.intToBuffer(2, 4),
-							},
-						},
-					},
-					{ storeKey: Buffer.from([0, 0, 1, 0]), storeValue: channelData },
-				],
-			};
-			const encodedAsset = codec.encode(genesisInteroperabilityStoreSchema, validData1);
-			const context = createGenesisBlockContext({
-				stateStore,
-				assets: new BlockAssets([{ module: MODULE_NAME_INTEROPERABILITY, data: encodedAsset }]),
-			}).createInitGenesisStateContext();
-			await expect(initGenesisStateUtil(context, interopMod.stores)).rejects.toThrow();
 		});
 
 		it('should create all the corresponding entries in the interoperability module state for every substore for valid input', async () => {

@@ -636,28 +636,6 @@ export const initGenesisStateUtil = async (
 		}
 		channelDataStoreKeySet.add(channelData.storeKey);
 
-		const tokenID = channelData.storeValue.messageFeeTokenID;
-		if (
-			!(
-				tokenID.chainID.readInt32BE(0) === 1 ||
-				tokenID.chainID.equals(channelData.storeKey) ||
-				tokenID.chainID.equals(ownChainAccount.chainID)
-			)
-		) {
-			throw new Error(
-				`Chain id corresponding to the channel data store key ${channelData.storeKey.toString(
-					'hex',
-				)} is not valid.`,
-			);
-		}
-		if (tokenID.chainID.equals(MAINCHAIN_ID_BUFFER) && tokenID.localID.readInt32BE(0) !== 0) {
-			throw new Error(
-				`Local id corresponding to the channel data store key ${channelData.storeKey.toString(
-					'hex',
-				)} is not valid.`,
-			);
-		}
-
 		await channelDataStore.set(ctx, channelData.storeKey, channelData.storeValue);
 	}
 

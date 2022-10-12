@@ -57,10 +57,7 @@ describe('SidechainCCRegistrationCommand', () => {
 	const ccmRegistrationParams = {
 		chainID,
 		name: ownChainAccount.name,
-		messageFeeTokenID: {
-			chainID: utils.intToBuffer(1, 4),
-			localID: utils.intToBuffer(0, 4),
-		},
+		messageFeeTokenID: Buffer.from('0000000000000011', 'hex'),
 	};
 
 	const encodedRegistrationParams = codec.encode(
@@ -84,10 +81,7 @@ describe('SidechainCCRegistrationCommand', () => {
 			root: Buffer.alloc(0),
 			size: 1,
 		},
-		messageFeeTokenID: {
-			chainID: utils.intToBuffer(1, 4),
-			localID: utils.intToBuffer(0, 4),
-		},
+		messageFeeTokenID: Buffer.from('0000000000000011', 'hex'),
 		outbox: {
 			appendPath: [],
 			root: Buffer.alloc(0),
@@ -131,10 +125,7 @@ describe('SidechainCCRegistrationCommand', () => {
 				root: Buffer.alloc(0),
 				size: 2,
 			},
-			messageFeeTokenID: {
-				chainID: utils.intToBuffer(1, 4),
-				localID: utils.intToBuffer(0, 4),
-			},
+			messageFeeTokenID: Buffer.from('0000000000000011', 'hex'),
 			outbox: {
 				appendPath: [],
 				root: Buffer.alloc(0),
@@ -233,10 +224,7 @@ describe('SidechainCCRegistrationCommand', () => {
 				root: Buffer.alloc(0),
 				size: 2,
 			},
-			messageFeeTokenID: {
-				chainID: utils.intToBuffer(3, 4),
-				localID: utils.intToBuffer(0, 4),
-			},
+			messageFeeTokenID: Buffer.from('0000000000000011', 'hex'),
 			outbox: {
 				appendPath: [],
 				root: Buffer.alloc(0),
@@ -268,10 +256,7 @@ describe('SidechainCCRegistrationCommand', () => {
 				root: Buffer.alloc(0),
 				size: 2,
 			},
-			messageFeeTokenID: {
-				chainID: utils.intToBuffer(1, 4),
-				localID: utils.intToBuffer(5, 4),
-			},
+			messageFeeTokenID: Buffer.from('0000000000000011', 'hex'),
 			outbox: {
 				appendPath: [],
 				root: Buffer.alloc(0),

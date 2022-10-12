@@ -216,10 +216,7 @@ export class SidechainRegistrationCommand extends BaseInteroperabilityCommand {
 		await chainSubstore.set(context, chainID, sidechainAccount);
 
 		// Add an entry in the channel substore
-		const messageFeeTokenID = {
-			chainID: utils.intToBuffer(1, 4),
-			localID: utils.intToBuffer(0, 4),
-		};
+		const messageFeeTokenID = Buffer.from('0000000000000011', 'hex');
 		const channelSubstore = this.stores.get(ChannelDataStore);
 		await channelSubstore.set(context, chainID, {
 			inbox: { root: EMPTY_HASH, appendPath: [], size: 0 },

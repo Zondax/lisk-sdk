@@ -195,28 +195,18 @@ type InboxOutboxJSON = {
 export type InboxJSON = InboxOutboxJSON;
 export type OutboxJSON = InboxOutboxJSON;
 
-export interface MessageFeeTokenID {
-	chainID: Buffer;
-	localID: Buffer;
-}
-
-export interface MessageFeeTokenIDJSON {
-	chainID: string;
-	localID: string;
-}
-
 export interface ChannelData {
 	inbox: Inbox;
 	outbox: Outbox;
 	partnerChainOutboxRoot: Buffer;
-	messageFeeTokenID: MessageFeeTokenID;
+	messageFeeTokenID: Buffer;
 }
 
 export interface ChannelDataJSON {
 	inbox: InboxJSON;
 	outbox: OutboxJSON;
 	partnerChainOutboxRoot: string;
-	messageFeeTokenID: MessageFeeTokenIDJSON;
+	messageFeeTokenID: string;
 }
 
 export interface CCCommandExecuteContext {

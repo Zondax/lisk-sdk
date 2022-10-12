@@ -12,15 +12,9 @@
  * Removal or modification of this copyright notice is prohibited.
  */
 import { BaseStore } from '../../base_store';
-import { Inbox, Outbox, MessageFeeTokenID } from '../types';
 import { HASH_LENGTH } from '../constants';
-
-export interface ChannelData {
-	inbox: Inbox;
-	outbox: Outbox;
-	partnerChainOutboxRoot: Buffer;
-	messageFeeTokenID: MessageFeeTokenID;
-}
+import { ChannelData } from '../types';
+import { TOKEN_ID_LENGTH } from '../../token/constants';
 
 const inboxOutboxProps = {
 	appendPath: {
@@ -68,19 +62,10 @@ export const channelSchema = {
 			fieldNumber: 3,
 		},
 		messageFeeTokenID: {
-			type: 'object',
+			dataType: 'bytes',
+			minLength: TOKEN_ID_LENGTH,
+			maxLength: TOKEN_ID_LENGTH,
 			fieldNumber: 4,
-			required: ['chainID', 'localID'],
-			properties: {
-				chainID: {
-					dataType: 'bytes',
-					fieldNumber: 1,
-				},
-				localID: {
-					dataType: 'bytes',
-					fieldNumber: 2,
-				},
-			},
 		},
 	},
 };

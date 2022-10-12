@@ -489,7 +489,7 @@ describe('Sidechain registration command', () => {
 				inbox: { root: EMPTY_HASH, appendPath: [], size: 0 },
 				outbox: { root: EMPTY_HASH, appendPath: [], size: 0 },
 				partnerChainOutboxRoot: EMPTY_HASH,
-				messageFeeTokenID: { chainID: utils.intToBuffer(1, 4), localID: utils.intToBuffer(0, 4) },
+				messageFeeTokenID: Buffer.from('0000000000000011', 'hex'),
 			};
 
 			// Act
@@ -607,7 +607,7 @@ describe('Sidechain registration command', () => {
 			const encodedParams = codec.encode(registrationCCMParamsSchema, {
 				name: transactionParams.name,
 				chainID: transactionParams.chainID,
-				messageFeeTokenID: { chainID: utils.intToBuffer(1, 4), localID: utils.intToBuffer(0, 4) },
+				messageFeeTokenID: Buffer.from('0000000000000011', 'hex'),
 			});
 			const ccm = {
 				nonce: BigInt(0),

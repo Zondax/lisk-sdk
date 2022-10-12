@@ -12,7 +12,7 @@
  * Removal or modification of this copyright notice is prohibited.
  */
 
-import { CHAIN_ID_LENGTH } from '../token/constants';
+import { CHAIN_ID_LENGTH, TOKEN_ID_LENGTH } from '../token/constants';
 import {
 	MAX_LENGTH_NAME,
 	NUMBER_MAINCHAIN_VALIDATORS,
@@ -320,19 +320,10 @@ export const registrationCCMParamsSchema = {
 			fieldNumber: 2,
 		},
 		messageFeeTokenID: {
-			type: 'object',
-			fieldNumber: 3,
-			required: ['chainID', 'localID'],
-			properties: {
-				chainID: {
-					dataType: 'bytes',
-					fieldNumber: 1,
-				},
-				localID: {
-					dataType: 'bytes',
-					fieldNumber: 2,
-				},
-			},
+			dataType: 'bytes',
+			minLength: TOKEN_ID_LENGTH,
+			maxLength: TOKEN_ID_LENGTH,
+			fieldNumber: 4,
 		},
 	},
 };
