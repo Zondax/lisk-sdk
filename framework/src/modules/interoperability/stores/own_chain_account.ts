@@ -12,6 +12,7 @@
  * Removal or modification of this copyright notice is prohibited.
  */
 import { BaseStore } from '../../base_store';
+import { CHAIN_ID_LENGTH } from '../../token/constants';
 
 export interface OwnChainAccount {
 	name: string;
@@ -30,6 +31,8 @@ export const ownChainAccountSchema = {
 		},
 		chainID: {
 			dataType: 'bytes',
+			minLength: CHAIN_ID_LENGTH,
+			maxLength: CHAIN_ID_LENGTH,
 			fieldNumber: 2,
 		},
 		nonce: {
