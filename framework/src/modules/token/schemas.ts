@@ -56,6 +56,10 @@ export const configSchema = {
 			minLength: TOKEN_ID_LENGTH * 2,
 			maxLength: TOKEN_ID_LENGTH * 2,
 		},
+		escrowInitializationFee: {
+			type: 'string',
+			format: 'uint64',
+		},
 	},
 };
 
@@ -222,6 +226,10 @@ export const crossChainTransferParams = {
 			dataType: 'uint64',
 			fieldNumber: 6,
 		},
+		escrowIntializationFee: {
+			dataType: 'uint64',
+			fieldNumber: 6,
+		},
 	},
 };
 
@@ -231,6 +239,8 @@ export interface CCTransferMessageParams {
 	senderAddress: Buffer;
 	recipientAddress: Buffer;
 	data: string;
+	messageFee: bigint;
+	escrowInitialzationFee: bigint;
 }
 
 export const crossChainTransferMessageParams = {

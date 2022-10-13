@@ -93,7 +93,7 @@ export interface CommandVerifyContext<T = undefined> {
 	chainID: Buffer;
 	transaction: Transaction; // without decoding params
 	params: T;
-	getMethodContext: () => ImmutableMethodContext;
+	getMethodContext: () => MethodContext;
 	getStore: (moduleID: Buffer, storePrefix: Buffer) => ImmutableSubStore;
 }
 

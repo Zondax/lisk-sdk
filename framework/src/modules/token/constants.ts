@@ -40,6 +40,9 @@ export const TOKEN_ID_LSK = Buffer.from([0, 0, 0, 0, 0, 0, 0, 0]);
 export const USER_SUBSTORE_INITIALIZATION_FEE = '5000000';
 export const TOKEN_ID_STORE_INITIALIZATION = TOKEN_ID_LSK;
 
+export const MAINCHAIN_ID = Buffer.from([0, 0, 0, 0]);
+export const ESCROW_SUBSTORE_INITIALIZATION_FEE = BigInt(5000000);
+
 export const defaultConfig = {
 	minBalances: [
 		{
@@ -49,6 +52,8 @@ export const defaultConfig = {
 	],
 	accountInitializationFee: USER_SUBSTORE_INITIALIZATION_FEE,
 };
+
+export const MODULE_NAME_TOKEN = 'token';
 
 export const EMPTY_BYTES = Buffer.alloc(0);
 

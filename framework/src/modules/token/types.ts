@@ -24,6 +24,7 @@ export interface ModuleConfig {
 	}[];
 	feeTokenID: string;
 	accountInitializationFee: string;
+	escrowInitializationFee: string;
 }
 
 export interface MinBalance {
