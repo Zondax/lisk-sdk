@@ -213,23 +213,74 @@ const insertLegacyCommands = metadata => {
 	});
 };
 
-const formatOutput = (index, title, value) =>
-	`${index} | ${capital(title)} : ${formatLSK(title, value)}`;
+const splitInScreens = value => {
+	const PAGE_LENGTH = 38;
+	const amountPages = Math.ceil(value.length / PAGE_LENGTH);
+	if (amountPages === 1) return [`: ${value}`];
+	const returnValue = [];
+	for (let i = 0; i < amountPages; i++) {
+		const finalValue = value.slice(i * PAGE_LENGTH, (i + 1) * PAGE_LENGTH);
+		returnValue.push(`[${i + 1}/${amountPages}] : ${finalValue}`);
+	}
+	return returnValue;
+};
 
-const capital = title => {
-	return title.charAt(0).toUpperCase() + title.slice(1);
+const formatOutput = (index, title, value) => {
+	if (!Array.isArray(value)) {
+		const returnValue = [];
+		const splitVal = splitInScreens(formatLSK(title, value));
+		splitVal.forEach(x => {
+			returnValue.push(`${index} | ${capitalAndShort(title)} ${x}`);
+		});
+		return returnValue;
+	}
+
+	const returnValue = [];
+	value.forEach((val, idx) => {
+		if (title === 'votes') {
+			splitInScreens(val.delegateAddress).forEach(x => {
+				returnValue.push(`${index + 2 * idx} | ${capitalAndShort(title)} ${idx} ${x}`);
+			});
+			splitInScreens(formatLSK('amount', val.amount)).forEach(x => {
+				returnValue.push(`${index + 2 * idx + 1} | ${capitalAndShort(title)} ${idx} ${x}`);
+			});
+		} else {
+			splitInScreens(val).forEach(x => {
+				returnValue.push(`${index + idx} | ${capitalAndShort(title)} ${idx} ${x}`);
+			});
+		}
+	});
+	return returnValue;
+};
+
+const capitalAndShort = title => {
+	const translate = {
+		recipientAddress: 'rxAddress',
+		accountInitializationFee: 'acntInitFee',
+		receivingChainID: 'rxChainID',
+		escrowInitializationFee: 'escrowInitFee',
+		messageFee: 'msgFee',
+		numberOfSignatures: 'nSignatures',
+		mandatoryKeys: 'key',
+		optionalKeys: 'optKey',
+		signatures: 'sign',
+		generatorKey: 'genKey',
+		proofOfPossession: 'poP',
+	};
+	const remap = translate[title] ?? title;
+	return remap.charAt(0).toUpperCase() + remap.slice(1);
 };
 
 const formatLSK = (title, value) => {
 	if (!['amount', 'fee'].includes(title)) {
-		return value;
+		return Array.isArray(value) ? value : String(value);
 	}
 	const lsk = convertBeddowsToLSK(value);
 
 	return `LSK ${lsk}`;
 };
 
-const mapName = (original) => {
+const mapName = original => {
 	switch (original) {
 		case 'crossChainTransfer':
 			return 'transferCrossChain';
@@ -242,7 +293,6 @@ const mapName = (original) => {
 		default:
 			return original;
 	}
-
 };
 
 const getNested = (obj, key) => {
@@ -292,18 +342,23 @@ const getNested = (obj, key) => {
 			...unsignedTx,
 			signatures: [signature.toString('hex')],
 		};
+		const createOutput = keys => {
+			const returnValue = [];
+			let extraScreens = 0;
+			keys.forEach((k, i) => {
+				const { name, value } = getNested(input.unsignedTransaction, k);
+				returnValue.push(...formatOutput(extraScreens + i, name, value));
+				if (Array.isArray(value)) extraScreens += value.length - 1;
+			});
+			return returnValue;
+		};
+
 		result.push({
 			index: result.length,
 			name: `${input.unsignedTransaction.module}_${input.unsignedTransaction.command}`,
 			blob: encodedTx.toString('hex'),
-			output: input.summaryKeys.map((k, i) => {
-				const { name, value } = getNested(input.unsignedTransaction, k);
-				return formatOutput(i, name, value);
-			}),
-			output_expert: input.detailKeys.map((k, i) => {
-				const { name, value } = getNested(input.unsignedTransaction, k);
-				return formatOutput(i, name, value);
-			}),
+			output: createOutput(input.summaryKeys),
+			output_expert: createOutput(input.detailKeys),
 			signature: signature.toString('hex'),
 		});
 	}
