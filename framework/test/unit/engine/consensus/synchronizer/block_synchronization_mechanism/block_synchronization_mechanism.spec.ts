@@ -509,7 +509,7 @@ describe('block_synchronization_mechanism', () => {
 
 		describe('request and revert to last common block from peer', () => {
 			describe('request the highest common block', () => {
-				it('should give up requesting the last common block after 3 tries, and then ban the peer and restart the mechanism', async () => {
+				it('should give up requesting the last common block if not found after reaching last finalized height, and then ban the peer and restart the mechanism', async () => {
 					// Set last block to a high height
 					const lastBlock = await createValidDefaultBlock({
 						header: {
@@ -591,7 +591,6 @@ describe('block_synchronization_mechanism', () => {
 						Errors.ApplyPenaltyAndRestartError,
 					);
 
-					expect(networkMock.requestFromPeer).toHaveBeenCalledTimes(3);
 					expect(networkMock.getConnectedPeers).toHaveBeenCalledTimes(1);
 
 					expect(

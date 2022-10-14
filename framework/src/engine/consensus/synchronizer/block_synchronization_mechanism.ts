@@ -349,21 +349,16 @@ export class BlockSynchronizationMechanism extends BaseSynchronizer {
 	 */
 	private async _requestLastCommonBlock(peerId: string): Promise<BlockHeader | undefined> {
 		const blocksPerRequestLimit = 10; // Maximum number of block IDs to be included in a single request
-		const requestLimit = 3; // Maximum number of requests to be made to the remote peer
 
-		let numberOfRequests = 1; // Keeps track of the number of requests made to the remote peer
 		let highestCommonBlock; // Holds the common block returned by the peer if found.
 		const validators = await this.blockExecutor.getCurrentValidators();
 		let currentRound = Math.ceil(this._chain.lastBlock.header.height / validators.length); // Holds the current round number
 		let currentHeight = currentRound * validators.length;
+		const finalizedHeight = this.blockExecutor.getFinalizedHeight();
 
-		while (
-			!highestCommonBlock &&
-			numberOfRequests < requestLimit &&
-			currentHeight >= this.blockExecutor.getFinalizedHeight()
-		) {
+		while (!highestCommonBlock && currentHeight >= finalizedHeight) {
 			const heightList = computeBlockHeightsList(
-				this.blockExecutor.getFinalizedHeight(),
+				finalizedHeight,
 				validators.length,
 				blocksPerRequestLimit,
 				currentRound,
@@ -372,7 +367,6 @@ export class BlockSynchronizationMechanism extends BaseSynchronizer {
 			const blockHeaders = await this._chain.dataAccess.getBlockHeadersWithHeights(heightList);
 
 			let data: BlockHeader | undefined;
-
 			try {
 				// Request the highest common block with the previously computed list
 				// to the given peer
@@ -381,14 +375,12 @@ export class BlockSynchronizationMechanism extends BaseSynchronizer {
 					blockHeaders.map(block => block.id),
 				);
 			} catch (e) {
-				numberOfRequests += 1;
+				currentRound -= blocksPerRequestLimit;
+				currentHeight = currentRound * validators.length;
 				continue;
 			}
 
 			highestCommonBlock = data; // If no common block, data is undefined.
-
-			currentRound -= blocksPerRequestLimit;
-			currentHeight = currentRound * validators.length;
 		}
 
 		return highestCommonBlock;
