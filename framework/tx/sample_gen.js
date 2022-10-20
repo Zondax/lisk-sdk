@@ -37,8 +37,8 @@ const tokenTransferKeys = {
 		'fee',
 		'params.tokenID',
 		'params.amount',
-		'params.accountInitializationFee',
 		'params.recipientAddress',
+		'params.accountInitializationFee',
 	],
 	detailKeys: [
 		'module',
@@ -80,19 +80,20 @@ const crossChainTransferKeys = {
 		'params.tokenID',
 		'params.amount',
 		'params.recipientAddress',
-		'params.escrowInitializationFee',
 		'params.receivingChainID',
+		'params.escrowInitializationFee',
 	],
 	detailKeys: [
 		'module',
 		'command',
 		'fee',
+		'nonce',
 		'params.tokenID',
 		'params.amount',
 		'params.recipientAddress',
 		'params.receivingChainID',
-		'params.messageFee',
 		'params.escrowInitializationFee',
+		'params.messageFee',
 		'params.data',
 	],
 };
@@ -131,6 +132,7 @@ const registerMultisignatureGroupKeys = {
 		'module',
 		'command',
 		'fee',
+		'nonce',
 		'params.numberOfSignatures',
 		'params.mandatoryKeys',
 		'params.optionalKeys',
@@ -172,6 +174,7 @@ const registerDelegateKey = {
 		'module',
 		'command',
 		'fee',
+		'nonce',
 		'params.name',
 		'params.generatorKey',
 		'params.blsKey',
@@ -200,7 +203,7 @@ const createRegisterDelegate = () => ({
 
 const voteDelegateKey = {
 	summaryKeys: ['module', 'command', 'fee', 'params.votes'],
-	detailKeys: ['module', 'command', 'fee', 'params.votes'],
+	detailKeys: ['module', 'command', 'fee', 'nonce', 'params.votes'],
 };
 
 const createVoteDelegate = () => ({
@@ -223,7 +226,7 @@ const createVoteDelegate = () => ({
 
 const unlockKey = {
 	summaryKeys: ['module', 'command', 'fee'],
-	detailKeys: ['module', 'command', 'fee'],
+	detailKeys: ['module', 'command', 'fee', 'nonce'],
 };
 
 const createUnlock = () => ({
@@ -241,7 +244,7 @@ const createUnlock = () => ({
 
 const reportDelegateMisbehaviorKey = {
 	summaryKeys: ['module', 'command', 'fee'],
-	detailKeys: ['module', 'command', 'fee'],
+	detailKeys: ['module', 'command', 'fee', 'nonce'],
 };
 
 const createReportDelegateMisbehavior = () => ({
@@ -262,7 +265,7 @@ const createReportDelegateMisbehavior = () => ({
 
 const sidechainCCUpdateKey = {
 	summaryKeys: ['module', 'command', 'fee', 'params.sendingChainID'],
-	detailKeys: ['module', 'command', 'fee', 'params.sendingChainID'],
+	detailKeys: ['module', 'command', 'fee', 'nonce', 'params.sendingChainID'],
 };
 
 const createCCUpdate = chain => ({
@@ -466,7 +469,7 @@ const createStateRecovery = () => ({
 
 const reclaimLSKKey = {
 	summaryKeys: ['module', 'command', 'fee', 'params.amount'],
-	detailKeys: ['module', 'command', 'fee', 'params.amount'],
+	detailKeys: ['module', 'command', 'fee', 'nonce', 'params.amount'],
 };
 
 const createReclaimLSK = () => ({
