@@ -213,7 +213,7 @@ const createVoteDelegate = () => ({
 		params: {
 			votes: new Array(randomNumber(20)).fill(0).map(() => ({
 				delegateAddress: randomAddress(),
-				amount: randomUInt64().toString(),
+				amount: (randomNumber(1000000) * 1000000000).toString(),
 			})),
 		},
 		signatures: [],
