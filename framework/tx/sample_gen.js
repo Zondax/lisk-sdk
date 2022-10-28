@@ -141,8 +141,8 @@ const registerMultisignatureGroupKeys = {
 };
 
 const createRegisterMultisignatureGroup = () => {
-	const numMandatory = randomNumber(32);
-	const numOptional = randomNumber(32);
+	const numMandatory = randomNumber(20);
+	const numOptional = randomNumber(20);
 	return {
 		unsignedTransaction: {
 			module: 'auth',
@@ -525,16 +525,16 @@ const createData = count => {
 	data.push(...new Array(count).fill(0).map(() => createVoteDelegate()));
 	data.push(...new Array(count).fill(0).map(() => createUnlock()));
 	data.push(...new Array(count).fill(0).map(() => createReportDelegateMisbehavior()));
-	data.push(...new Array(count).fill(0).map(() => createCCUpdate('Mainchain')));
-	data.push(...new Array(count).fill(0).map(() => createCCUpdate('Sidechain')));
-	data.push(...new Array(count).fill(0).map(() => createMainchainRegistration()));
-	data.push(...new Array(count).fill(0).map(() => createMessageRecovery()));
-	data.push(...new Array(count).fill(0).map(() => createMessageRecoveryInitialization()));
-	data.push(...new Array(count).fill(0).map(() => createSidechainRegistration()));
-	data.push(...new Array(count).fill(0).map(() => createStateRecoveryInitialization()));
-	data.push(...new Array(count).fill(0).map(() => createStateRecovery()));
+	// data.push(...new Array(count).fill(0).map(() => createCCUpdate('Mainchain')));
+	// data.push(...new Array(count).fill(0).map(() => createCCUpdate('Sidechain')));
+	// data.push(...new Array(count).fill(0).map(() => createMainchainRegistration()));
+	// data.push(...new Array(count).fill(0).map(() => createMessageRecovery()));
+	// data.push(...new Array(count).fill(0).map(() => createMessageRecoveryInitialization()));
+	// data.push(...new Array(count).fill(0).map(() => createSidechainRegistration()));
+	// data.push(...new Array(count).fill(0).map(() => createStateRecoveryInitialization()));
+	// data.push(...new Array(count).fill(0).map(() => createStateRecovery()));
 	data.push(...new Array(count).fill(0).map(() => createReclaimLSK()));
-	data.push(...new Array(count).fill(0).map(() => createRegisterKeys()));
+	//data.push(...new Array(count).fill(0).map(() => createRegisterKeys()));
 	return data;
 };
 
