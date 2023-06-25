@@ -45,7 +45,7 @@
 		"@liskhq/lisk-cryptography": "^4.0.0-alpha.3",
 		"@liskhq/lisk-validator": "^0.7.0-alpha.3",
 		"lodash.shuffle": "4.2.0",
-		"semver": "7.3.5",
+		"semver": "7.5.2",
 		"socketcluster-client": "14.3.1",
 		"socketcluster-server": "14.6.0"
 	},
